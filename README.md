@@ -17,12 +17,13 @@
    
    ```bash
    git clone https://github.com/Draugsleip/Interpol-Red-Notices-Tracker.git
-2. Create your own configuration file using the `.env` template
-   ```bash
-   cp .env.example .env
-3. Navigate to the project directory
+
+2. Navigate to the project directory
    ```bash
    cd Interpol-Red-Notices-Tracker
+3. Create your own configuration file using the `.env` template
+   ```bash
+   copy .env.example .env
 4. Start the services
    ```bash
    docker-compose up --build
