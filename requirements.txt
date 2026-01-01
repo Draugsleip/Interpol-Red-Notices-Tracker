@@ -1,0 +1,8 @@
+Flask
+pika
+SQLAlchemy
+psycopg2-binary
+requests
+python-dotenv
+minio
+pycountry

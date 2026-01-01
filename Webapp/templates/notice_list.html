@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interpol Red Notices</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1 id="site_header">Interpol Red Notices</h1>
+    </header>
+    
+    <nav class="navigator">
+        <button onclick="window.location.href='/'">Homepage</button>
+        <button onclick="window.location.href='/notice_list'">Notice List</button>
+    </nav>
+
+    <div class="notice_list">
+        <table>
+            <thead>
+                <tr>
+                    <th>Entity ID</th>
+                    <th >Name</th>
+                    <th>Forename</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for notice in all_notices %}
+                <tr onclick="window.location.href='/notice/{{ notice.entity_id }}'">
+                    <td id="entity_id_column">{{ notice.entity_id }}</td>
+                    <td id="name_column">{{ notice.name }}</td>
+                    <td id="forename_column">{{ notice.forename }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+    </div>
+
+    <script src="{{ url_for('static', filename='index.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notice detail: {{ notice.entity_id }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1 id="site_header">Interpol Red Notices</h1>
+    </header>
+    <nav class="navigator">
+        <button onclick="window.location.href='/'">Homepage</button>
+        <button onclick="window.location.href='/notice_list'">Notice List</button>
+    </nav>
+
+    <section class="notice_detail_values_all">
+    
+        <div class="details_card" id="entity_card">
+            <h3> Entity ID </h3>
+            <span class="detail_value">{{ notice.entity_id }}</span>
+        </div>
+
+        <div class="details_card" id="imgs_card">
+            <h3>Photos</h3>
+            {% if images %}
+            <div class="img_container">
+                {% for img in images %}
+                <div class="img_wrapper">
+                    <img src="{{ url_for('minio_get_img', object_name=img) }}" 
+                    alt="Notice Photo"
+                    onclick="openModal(this.src)">
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div>
+                <p>No photos available.</p>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="details_card" id="personal_details">
+            <h3>Personal Details</h3>
+            <div class="sections">
+                <h5 class="detail_label"> Name & Forename: </h5>
+                <span class="detail_value">{{ notice.name }} {{ notice.forename }}</span>
+            </div>
+
+            {%if notice.date_of_birth%}
+            <div class="sections">
+                <h5 class="detail_label"> Date of Birth (YY/MM/DD):  </h5>
+                <span class="detail_value">
+                    {{ notice.date_of_birth }}
+                    {% if notice.date_of_birth %}
+                        ({{ now.year - (notice.date_of_birth.split('/')[0] | int) }} yo)
+                    {% endif %}
+                </span>
+                
+            </div>
+            {%endif%}
+
+            {%if notice.place_of_birth or notice.country_of_birth_id %}
+            <div class="sections">
+                <h5 class="detail_label"> Place of Birth:  </h5>
+                {% if notice.place_of_birth and notice.country_of_birth_id %}
+                    <span class="detail_value">{{ notice.place_of_birth}}, {{ notice.country_of_birth_id | country_names}}</span>
+                {% elif notice.place_of_birth %}
+                    <span class="detail_value">{{ notice.place_of_birth}}</span>
+                {% elif notice.country_of_birth_id %}
+                    <span class="detail_value">{{ notice.country_of_birth_id | country_names}}</span>
+                {%endif%}
+            </div>
+            {%endif%}
+            
+            {%if notice.nationalities%}
+            <div class="sections">
+                <h5 class="detail_label"> Nationalities:  </h5>
+                <span class="detail_value">{{ notice.nationalities | country_names | join(', ')}}</span>
+            </div>
+            {%endif%}
+
+            {%if notice.languages_spoken_ids %}
+            <div class="sections">
+                <h5 class="detail_label"> Languages:  </h5>
+                <span class="detail_value">{% if notice.languages_spoken_ids %}
+                                                {{ notice.languages_spoken_ids | map('language_names') | join(', ') }}
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                </span>
+            </div>
+            {%endif%}
+
+            {%if notice.eyes_colors_id%}
+            <div class="sections">
+                <h5 class="detail_label"> Eye Color:  </h5>
+                <span class="detail_value">{{ notice.eyes_colors_id| eye_color | join(', ')}}</span>
+            </div>
+            {%endif%}
+
+            {%if notice.hairs_id%}
+            <div class="sections">
+                <h5 class="detail_label"> Hair Color:  </h5>
+                <span class="detail_value">{{ notice.hairs_id| hair_color | join(', ')}}</span>
+            </div>
+            {%endif%}
+
+            {%if notice.sex_id%}
+            <div class="sections">
+                <h5 class="detail_label"> Gender:  </h5>
+                <span class="detail_value">{{ notice.sex_id | sex_id}}</span>
+            </div>
+            {%endif%}
+
+            {%if notice.weight%}
+            <div class="sections">
+                <h5 class="detail_label"> Weight:  </h5>
+                <span class="detail_value">{% if notice.weight %}
+                                                {{ notice.weight }} kg
+                                            {% else %}
+                                                -
+                                            {%endif%}
+                </span>
+            </div>
+            {%endif%}
+            
+            {%if notice.height%}
+            <div class="sections">
+                <h5 class="detail_label"> Height:  </h5>
+                <span class="detail_value">{% if notice.height %}
+                                                {{ notice.height }} m
+                                            {% else %}
+                                                -
+                                            {%endif%}
+                </span>
+            </div>
+            {%endif%}
+
+            {%if notice.distinguishing_marks%}
+                <div class="sections">
+                    <h5 class="detail_label">Distinguishing Marks:</h5>
+                    <span class="detail_value">{{ notice.distinguishing_marks }}</span>
+                </div>
+            {%endif%}
+        </div>
+
+        {% if notice.arrest_warrants%}
+        <div class="details_card" id="arrest_warrants">
+            
+            <h3>Arrest Warrants</h3>
+
+            {%for warrant in notice.arrest_warrants %}
+
+                <div class="details_card">
+                    <div class="sections">
+                        <div class="sections">
+                            <div class="charge">
+                                <h5 class="detail_label">Charge:</h5>
+                                <span class="detail_value">{{warrant.charge}}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="sections">
+                            {% if warrant.charge_translation %}
+                            <div class="sections">
+                                <h5 class="detail_label">Charge Translation:</h5>
+                                <span class="detail_value">{{warrant.charge_translation}}</span>
+                            </div>
+                            {%endif%}
+                        </div>
+                        
+                        <div class="sections">
+                            {% if warrant.issuing_country_id %}
+                            <div class="sections">
+                                <h5 class="detail_label">Issuing Country:</h5>
+                                <span class="detail_value">{{warrant.issuing_country_id | country_names}}</span>
+                            </div>
+                            {%endif%}
+                        </div>
+                        
+                    </div>
+                </div>
+                    
+            
+            {%endfor%}
+            
+        </div>
+        {%endif%}
+
+        <div class="details_card" id="fetch_date_card">
+            <h3>Sync Date</h3>
+            <span class="detail_value">{{ notice.upload_time }}</span>
+            <br>
+            <span><small>Data sourced <a href={{ source }}>from</a></small></span>
+        </div>
+
+    </section>
+
+    <div id="imageModal" class="modal" onclick="closeModal()">
+        <img class="modal-content" id="img">
+    </div>
+
+    <script src="{{ url_for('static', filename='index.js') }}"></script>
+</body>
+</html>
