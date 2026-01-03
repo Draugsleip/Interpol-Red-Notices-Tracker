@@ -9,7 +9,7 @@
 - **`Webapp:`** Flask application that serves template webpages and forwards data to the frontend.
 
 ## Modules & Key Methods
-**Producer**
+### **Producer**
 
 - `fetch_details.py`: Handles the process of fetching data and publishing it to RabbitMQ.
 
@@ -27,7 +27,7 @@
 	
 	- publish_meta(): Function that accept metadata as parameter and sends it to the queue.
 
-**Organizer**
+### **Organizer**
 
 - `message_receiver.py`: Processes incoming messages from the queue and saves them to the database also handles the transfer of notice images to MinIO.
 
@@ -43,7 +43,7 @@
    
 	- list_from_minio(): Lists images of a notice using entity ID as a prefix.
 
-**Webapp**
+### **Webapp**
 
 - `webapp.py`: Flask application with routes and template filters, serves data to frontend.
 
