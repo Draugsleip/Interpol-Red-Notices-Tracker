@@ -3,8 +3,49 @@
 **`Interpol-Red-Notices-Tracker`** is composed of three dockerized modules:
 
 - **`Producer:`** Fetches the [Red Notices](https://www.interpol.int/How-we-work/Notices/Red-Notices/View-Red-Notices), extracts metadata, and publishes it to a RabbitMQ queue. It runs continuously at a predefined interval.
+  
 - **`Organizer:`** Consumes messages from RabbitMQ and saves notice details to the PostgreSQL database. It is also responsible for storing related images for each notice in MinIO.
+
 - **`Webapp:`** Flask application that serves template webpages and forwards data to the frontend.
+
+## Modules & Key Methods
+**Producer**
+
+- `fetch_details.py`: Handles the process of fetching data and publishing it to RabbitMQ.
+
+	- make_session(): Creates a requests session with headers from 'config/headers.json'
+	
+	- fetch_all_data(): The main method. Firstly, it classifies notices by nationality as either light (total notices < 160) or heavy (total notices > 160). For heavy categories, additional queries are used to ensure no notices are missed. Query urls are built using a bruteforce approach. Once all notice details are retrieved they are published to the RabbitMQ queue.
+
+- `query_options.py`: Contains the options required for bruteforce querying. Builds urls and generates query parameters.
+  
+	- bruteforce_params(): Generates parameter combinations for comprehensive data fetching. For light countries, only nationality is used. For heavy countries, more specific parameters (age, gender, name, and freetext) are combined in different ways to cover all possible cases.
+
+- `rabbitmq_client.py`: Client that publishes notice details to the queue.
+	
+	- _connect(): Establishes connection with retry and heartbeat logic in case of a disconnection.
+	
+	- publish_meta(): Function that accept metadata as parameter and sends it to the queue.
+
+**Organizer**
+
+- `message_receiver.py`: Processes incoming messages from the queue and saves them to the database also handles the transfer of notice images to MinIO.
+
+	- save_to_db(): When a message is received, it checks the database if that notice is already exists in database or its new.
+   
+	- process_rabbit_messages(): Receives messages, transfers notice images to MinIO and notice details to database.
+
+- `database_config.py`: Establishes the database connection and creates the necessary table structures.
+
+- `minio_client.py`: Sets the connection and creates a bucket. Handles the images that need to be sent to or retreived from MinIO.
+	
+   - send_to_minio_img(): Uploads images into MinIO bucket using the entity ID as filename.
+   
+	- list_from_minio(): Lists images of a notice using entity ID as a prefix.
+
+**Webapp**
+
+- `webapp.py`: Flask application with routes and template filters, serves data to frontend.
 
 ## How to use
 
