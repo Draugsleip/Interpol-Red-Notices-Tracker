@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interpol Red Notices</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <header>
+        <h1 id="site_header">Interpol Red Notices</h1>
+    </header>
+    <nav class="navigator">
+        <button onclick="window.location.href='/'">Homepage</button>
+        <button onclick="window.location.href='/notice_list'">Notice List</button>
+    </nav>
+
+    <div id="notices_count">
+        <p>Total Notices: {{ total_notices }}</p>
+        <p>Last Updated: {{ last_updated }}</p>
+    </div>
+
+    <script src="{{ url_for('static', filename='index.js') }}"></script>
+</body>
+</html>
